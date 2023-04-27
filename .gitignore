@@ -1,0 +1,9 @@
+# temporary ignores whilst I work on it
+md_resources/
+step_by_step.ipynb
+devnotes.md
+
+# perma ignores
+transformer_from_scratch_venv/
+__pycache__/
+.vscode

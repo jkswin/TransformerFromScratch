@@ -2,6 +2,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.special import erf
 
+#TODO: refactor into classes
+
 # softmax returns a probability distribution over classes so is used for multiclass classification
 
 def relu(x):
@@ -54,7 +56,7 @@ def elu(x, alpha=1.0):
 
 def elu_prime(x, alpha=1.0):
     x_alpha = elu(x) + alpha
-    return np.where(x >= 0, x, x_alpha)
+    return np.where(x >= 0, 1, x_alpha)
 
 def selu(x):
     raise NotImplementedError()
@@ -81,6 +83,24 @@ def layer_norm(x, eps=1e-6):
 ALL_ACTIVATIONS = [relu, relu_prime, leaky_relu, leaky_relu_prime, 
     sigmoid, sigmoid_prime, tanh, tanh_prime, 
     linear, softmax, elu, elu_prime, gelu, gelu_prime]
+
+
+# Playing with more complex weight initlization methods 
+def relu_init(W: np.ndarray) -> np.ndarray:
+    """
+    Apply He initialization to the random weight matrix. 
+    Used when the chosen non-linearity is ReLU.
+    """
+    return W * np.sqrt(2/(W.shape[0] - 1))
+
+
+def tanh_init(W: np.ndarray) -> np.ndarray:
+    """
+    Apply Xavier initialization to the random weight matrix. 
+    Used when the chosen non-linearity is TanH.
+    """
+
+    return W * np.sqrt(1/(W.shape[0] - 1))
 
 
 if __name__ == "__main__":

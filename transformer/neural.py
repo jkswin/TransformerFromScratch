@@ -13,7 +13,7 @@ from toy_data.dataset_wrapper import Datasets
 from utils.activation_functions import relu, relu_prime, leaky_relu, leaky_relu_prime, \
                                 sigmoid, sigmoid_prime, tanh, tanh_prime, \
                                 linear, linear_prime, softmax, elu, elu_prime, softmax_prime, \
-                                gelu, gelu_prime
+                                gelu, gelu_prime, relu_init, tanh_init
 
 from utils.loss_functions import logloss, logloss_prime, mse, mse_prime, rmse
 from utils.utils import *
@@ -114,6 +114,7 @@ class FFLayer:
         self.W = np.random.randn(output_dim, input_dim)
         self.b = np.random.randn(1, output_dim)
         self.act, self.act_prime = self.activation_functions.get(activation)
+        self._weight_init(activation)
 
     def __str__(self) -> str:
 
@@ -128,6 +129,17 @@ class FFLayer:
         """
 
         return f"Inputs: {self.W.shape[1]}\nOutputs: {self.W.shape[0]}\nActivation: {self.act.__name__}\n"
+    
+    def _weight_init(self, activation:str):
+        
+        if activation.endswith("elu"):
+            self.W = relu_init(self.W)    
+
+        elif activation == "tanh":
+            self.W = tanh_init(self.W)
+
+        else:
+            return
 
 
     def forward(self, inputs):
@@ -201,13 +213,6 @@ class FFLayer:
         array_like
             The output activations of the layer after layer normalization, of shape (batch_size, output_dim).
             
-        Notes
-        -----
-        Applies layer normalization to the output of the forward method, using the simplified version that does not
-        apply beta and gamma parameters. Layer normalization is a normalization technique that standardizes the inputs to each
-        neuron across the batch, helping to reduce the impact of the scale of the inputs on training. 
-        Note that the layer normalization is applied after the forward method is called, so the weight matrix and bias vector are used as usual.
-        
         """
 
         x = inputs
@@ -329,7 +334,35 @@ class FFNeuralNet:
         return np.where(self.predict(X) > threshold, 1, 0)
     
 
-    
+class RCLayer:
+    """
+    A Recurrent Layer.
+    """
+    def __init__(self, input_dim: int, output_dim: int, activation: str, lr: float, seed=False):
+
+        self.activation_functions = {
+            "tanh": [tanh, tanh_prime],
+            "sigmoid": [sigmoid, sigmoid_prime],
+            "relu": [relu, relu_prime], 
+            "leaky_relu": [leaky_relu, leaky_relu_prime],
+            "linear": [linear, linear_prime],
+            "elu": [elu, elu_prime],
+            "softmax": [softmax, softmax_prime],
+            "gelu": [gelu, gelu_prime]
+            }
+
+        if seed:
+            np.random.seed(seed)
+
+        self.lr = lr
+        self.Wxh = np.random.randn(output_dim, input_dim)
+
+        self.b = np.random.randn(1, output_dim)
+        self.act, self.act_prime = self.activation_functions.get(activation)
+
+        
+
+
 
 if __name__ == "__main__":
 
@@ -352,14 +385,14 @@ if __name__ == "__main__":
 
     net = FFNeuralNet(
         layer_sizes= [dimension_of_x, 64, 64, 1],
-        activations= ["relu", "relu", "sigmoid"],
+        activations= ["gelu", "gelu", "sigmoid"],
         loss = "mse",
         seed=42,
-        lr=0.001,
+        lr=0.1,
         )
     
     
-    losses = net.train(X=X_train, y=y_train, epochs=100, batch_size=64, norm=True)
+    losses = net.train(X=X_train, y=y_train, epochs=1000, batch_size=64, norm=True)
     plt.plot(range(len(losses)), losses)
     plt.xlabel("Epoch")
     plt.ylabel(net.loss.__name__.title() + " Loss")

@@ -42,7 +42,7 @@ def timer(func):
         start = datetime.now()
         result = func(*args, **kwargs)
         end = datetime.now()
-        print(f"{func.__name__} Duration: {end-start}")
+        print(f"{func.__name__} duration: {end-start}")
         return result
     
     return wrapper

@@ -390,7 +390,7 @@ class RCLayer:
 
 if __name__ == "__main__":
 
-    X_train, X_test, y_train, y_test = Datasets.load_pokemon(
+    X_train, X_test, y_train, y_test, i_train, i_test, pokemon_df = Datasets.load_pokemon(
         train_size=0.9,
         upsample=True, # very few pokemon are legendary so I apply very basic smote upsampling
     )
@@ -431,3 +431,7 @@ if __name__ == "__main__":
 
     cm = ConfusionMatrixDisplay.from_predictions(y_true=y_test, y_pred=y_hat)
     plt.show()
+
+    misclass = pokemon_df.loc[i_test]
+    misclass["pred"] = y_hat
+    print(misclass[["name", "legend", "pred"]][misclass["legend"] != misclass["pred"]])

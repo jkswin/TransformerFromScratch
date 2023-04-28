@@ -19,7 +19,7 @@ from utils.loss_functions import logloss, logloss_prime, mse, mse_prime, rmse
 from utils.utils import *
 
 
-
+# TODO: Lots of similarity between FF and Recurrent layers. Make a general layer class and inheret from that.
 
 
     
@@ -356,12 +356,36 @@ class RCLayer:
 
         self.lr = lr
         self.Wxh = np.random.randn(output_dim, input_dim)
+        self.Whh = np.random.randn(output_dim, output_dim)
 
-        self.b = np.random.randn(1, output_dim)
+        self.bh = np.random.randn(1, output_dim)
         self.act, self.act_prime = self.activation_functions.get(activation)
 
-        
 
+    def _weight_init(self, activation:str):
+        
+        if activation.endswith("elu"):
+            self.Wxh = relu_init(self.Wxh)
+            self.Whh = relu_init(self.Whh)      
+
+        elif activation == "tanh":
+            self.Wxh = tanh_init(self.Wxh)
+            self.Whh = tanh_init(self.Whh) 
+
+        else:
+            return
+
+        
+    def forward(self, inputs, h_prev):
+
+        self.inputs = inputs
+        self.outputs = np.dot(self.inputs, self.Wxh) + np.dot(h_prev, self.Whh) + self.bh
+        self.activations = self.act(self.outputs)
+
+        return self.activations
+
+
+    
 
 
 if __name__ == "__main__":

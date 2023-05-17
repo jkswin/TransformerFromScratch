@@ -43,15 +43,18 @@ def linear_prime(x):
     return 1
 
 def softmax(x):
-    return np.exp(x)/np.sum(np.exp(x))
+    exps = np.exp(x - np.max(x, axis=1, keepdims=True))
+    return exps / np.sum(exps, axis=1, keepdims=True)
 
 def softmax_prime(x):
-    s = softmax(x)
-    return np.diag(s) - np.outer(s, s)
+    softmax_output = softmax(x)
+    return softmax_output * (1 - softmax_output)
+
 
 # elu & prime implimented from https://arxiv.org/pdf/1511.07289.pdf
 def elu(x, alpha=1.0):
-    ex_x_alpha = alpha * (np.exp(x) - 1)
+    x = np.clip(-1,1,x)
+    ex_x_alpha = alpha * (np.exp(x)- 1)
     return np.where(x >= 0, x, ex_x_alpha)
 
 def elu_prime(x, alpha=1.0):
@@ -82,7 +85,7 @@ def layer_norm(x, eps=1e-6):
 
 ALL_ACTIVATIONS = [relu, relu_prime, leaky_relu, leaky_relu_prime, 
     sigmoid, sigmoid_prime, tanh, tanh_prime, 
-    linear, softmax, elu, elu_prime, gelu, gelu_prime]
+    linear, softmax, softmax_prime, elu, elu_prime, gelu, gelu_prime]
 
 
 # Playing with more complex weight initlization methods 
@@ -106,6 +109,7 @@ def tanh_init(W: np.ndarray) -> np.ndarray:
 if __name__ == "__main__":
 
     x = np.linspace(-10,10)
+    print(x.shape)
 
     plot_cols = 4
     plot_rows = 4

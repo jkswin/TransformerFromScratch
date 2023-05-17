@@ -5,6 +5,8 @@ from collections import Counter
 from imblearn.over_sampling import SMOTE
 from dataclasses import dataclass
 import numpy as np 
+import requests
+import json
 
 NAME_PATH = {
     "pokemon":"transformer/toy_data/pokemon_data.csv"
@@ -62,9 +64,50 @@ class Datasets:
         return X_train, X_test, y_train,  y_test, i_train, i_test, pokemon_df
     
 
+    def load_yugioh() -> "tuple[list[str], list[np.ndarray]]":
+        """
+        Load a list of all current YugiOh Card names. 
+        :return: _description_
+        :rtype: _type_
+        """
+
+        api_endpoint = "https://db.ygoprodeck.com/api/v7/cardinfo.php"
+        data_path = "transformer/toy_data/yugioh_db.json"
+
+        if os.path.exists(data_path):
+            with open(data_path, "r") as f:
+                data = json.load(f)
+
+        else:
+            print(f"Downloading from: {api_endpoint}")
+            data = json.loads(requests.get(api_endpoint).content)
+            with open(data_path, "w") as f:
+                json.dump(data, f)
+        
+        card_names = [card["name"] for card in data["data"]]
+
+        # quick one hot encoding
+        chars = {char:idx for idx, char in enumerate(["<S>", "<E>"] + sorted( list(set("".join(card_names).lower()))))}
+        
+        one_hot = []
+        
+        for card in card_names:
+            card= ["<S>"] + [c for c in card.lower()] + ["<E>"]
+            enc = np.zeros([len(card), len(chars)])
+            for vector, char in zip(enc, card):
+                vector[chars[char]] = 1.0
+
+            one_hot.append(enc)
+
+        return card_names, one_hot
+    
+
 
 if __name__ == "__main__":
-    data = Datasets.load_pokemon(
-        upsample=True
-    )
-    
+    #data = Datasets.load_pokemon(
+    #    upsample=True
+    #)
+
+   names, one_hots = Datasets.load_yugioh()
+   print(names[0])
+   print(one_hots[0])

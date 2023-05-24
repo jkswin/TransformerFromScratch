@@ -9,7 +9,10 @@ import requests
 import json
 
 NAME_PATH = {
-    "pokemon":"transformer/toy_data/pokemon_data.csv"
+    "pokemon":"transformer/toy_data/pokemon_data.csv",
+    "pokemon_nlp": "transformer/toy_data/pokemon_bios.json",
+    "pokemon_legendary": "transformer/toy_data/pokemon_legendary.csv",
+    "yugioh": "transformer/toy_data/yugioh_db.json",
 }
 
 @dataclass
@@ -63,8 +66,46 @@ class Datasets:
 
         return X_train, X_test, y_train,  y_test, i_train, i_test, pokemon_df
     
+    def load_pokemon_nlp() -> dict:
+        """
+        Load a list of 583 pokemon records with `name`, `desc` and `type`.
+        Intended data use is to predict typing from natural language description. 
 
-    def load_yugioh() -> "tuple[list[str], list[np.ndarray]]":
+        :return: _description_
+        :rtype: dict
+        """
+
+        print("LOADING POKEMON DESCRIPTIONS...")
+
+        data_path = NAME_PATH["pokemon_nlp"]
+
+        with open(data_path, "r") as f:
+            data = json.load(f)
+
+        pokemon_df = pd.read_csv(
+            NAME_PATH["pokemon_legendary"]
+        )
+        
+        records = []
+        n_tokens = 0
+        # replace pokemon names with a special token
+        for k,v in data.items():
+            if k in pokemon_df["Name"].to_list():
+                for pok in list(data.keys()):
+                    desc = v.replace(pok,"<POK>")
+                desc = desc.strip()
+                record = {"name":k, "desc":desc, "type":list(pokemon_df[pokemon_df["Name"] == k][["Type 1", "Type 2"]].values[0])}
+                records.append(record)
+                n_tokens += len(desc.split())
+
+        print(f"n_pokemon: {len(records)}\nn_tokens: {n_tokens}")
+
+
+        return records
+
+    
+
+    def load_yugioh(update=False) -> "tuple[list[str], list[np.ndarray]]":
         """
         Load a list of all current YugiOh Card names. 
         :return: _description_
@@ -72,9 +113,9 @@ class Datasets:
         """
 
         api_endpoint = "https://db.ygoprodeck.com/api/v7/cardinfo.php"
-        data_path = "transformer/toy_data/yugioh_db.json"
+        data_path = NAME_PATH["yugioh"]
 
-        if os.path.exists(data_path):
+        if os.path.exists(data_path) and not update:
             with open(data_path, "r") as f:
                 data = json.load(f)
 
@@ -108,6 +149,8 @@ if __name__ == "__main__":
     #    upsample=True
     #)
 
-   names, one_hots = Datasets.load_yugioh()
-   print(names[0])
-   print(one_hots[0])
+   #names, one_hots = Datasets.load_yugioh()
+   #print(names[0])
+   #print(one_hots[0])
+
+   data = Datasets.load_pokemon_nlp()

@@ -43,7 +43,8 @@ def linear_prime(x):
     return 1
 
 def softmax(x):
-    exps = np.exp(x - np.max(x, axis=1, keepdims=True))
+    ## dimensions set to work with neural implementation. To chart this remove the axis and keepdims arguments.
+    exps = np.exp(x - np.max(x), axis=1, keepdims=True)
     return exps / np.sum(exps, axis=1, keepdims=True)
 
 def softmax_prime(x):
@@ -85,7 +86,7 @@ def layer_norm(x, eps=1e-6):
 
 ALL_ACTIVATIONS = [relu, relu_prime, leaky_relu, leaky_relu_prime, 
     sigmoid, sigmoid_prime, tanh, tanh_prime, 
-    linear, softmax, softmax_prime, elu, elu_prime, gelu, gelu_prime]
+    linear, elu, elu_prime, gelu, gelu_prime]#, softmax, softmax_prime]
 
 
 # Playing with more complex weight initlization methods 
@@ -127,8 +128,4 @@ if __name__ == "__main__":
                 
 
     plt.show()
-
-    
-    print(elu(np.array([[ 0, 1, -2, 3],
-                         [-1, -15, 3, 4]]), alpha=0.9))
     

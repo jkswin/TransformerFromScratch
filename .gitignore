@@ -6,3 +6,6 @@ devnotes.md
 transformer_from_scratch_venv/
 __pycache__/
 .vscode
+.env
+sandbox.py
+bpe_model.json

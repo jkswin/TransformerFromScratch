@@ -15,13 +15,13 @@ If I've explicitly used other people's work as inspiration it'll be mentioned at
     - Layer Normalization
     - [He and Xavier Initialisation](transformer/utils/activation_functions.py)
     - Outputs for Simple, Binary Classification and Multiclass Classification problems
-- [Simple Logistic Regression](transfomer/regression.py) to [compare to NN for Pokemon Classification]:
+- [Simple Logistic Regression](transformer/regression.py) to [compare to NN for Pokemon Classification]:
     - Beginning with Linear Regression.
     - And a LocalFactorOutlier class for outlier removal. 
     - And a Logistic Regression class that inherets from the base linear regressor. 
 
 **In Progress:**
-- [BPE Tokenizer](transformer\utils\tokenizer.py)
+- [BPE Tokenizer](transformer/utils/tokenizer.py)
 - Positional Encodings
 - Fixing LOF Implementation
 - RNN because I stretched the forward layer to a full NN so may as well keep going (also curious to see how Vanilla FFNN + Positional Encodings works in comparison to Recurrence)

@@ -9,3 +9,4 @@ __pycache__/
 .env
 sandbox.py
 bpe_model.json
+transformer/toy_data/yugioh_db.json

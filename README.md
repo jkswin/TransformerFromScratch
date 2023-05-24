@@ -4,7 +4,7 @@ This started as a _Transformers from Scratch_ project, but turned into an _Every
 
 With each component I have additionally explored other rabbit-holes and scratch built those here too. It is now my default repo for making scratch-implementations for learning purposes/when I'm bored.
 
-If I've explicitly used other peoples work as inspiration it'll be mentioned at the top of the file or with the appropriate function etc.
+If I've explicitly used other people's work as inspiration it'll be mentioned at the top of the file or with the appropriate function etc.
 
 ![scratch](md_resources/scratch.png)
 
